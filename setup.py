@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='drf-tools',
-    version="0.9.0",
+    version="0.9.1",
     url='https://github.com/seebass/drf-tools',
     license='MIT',
     description='Multiple extensions and test utilities for Django REST Framework 3',
@@ -16,7 +16,7 @@ setup(
         'drf-nested-fields>=0.9.0',
         'drf-hal-json>=0.9.0',
         'drf-enum-field>=0.9.0',
-        'drf-nested-routin>=0.9.0',
+        'drf-nested-routing>=0.9.0',
         'django-filter>=0.10.0',
         'openpyxl>=2.2.5',
         'chardet>=2.3.0'
