@@ -8,11 +8,11 @@ class BaseFileRenderer(OriginalBaseRenderer):
     KWARGS_KEY_FILENAME = "filename"
 
     def _add_filename_to_response(self, renderer_context):
-        filename = self.__get_filename(renderer_context)
+        filename = self._get_filename(renderer_context)
         if filename:
             renderer_context['response']['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
 
-    def __get_filename(self, renderer_context):
+    def _get_filename(self, renderer_context):
         filename = renderer_context['kwargs'].get(self.KWARGS_KEY_FILENAME)
         if filename and self.format and not filename.endswith('.' + self.format):
             filename += "." + self.format

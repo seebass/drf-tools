@@ -31,18 +31,18 @@ def exception_handler(exc):
     if status_code == status.HTTP_500_INTERNAL_SERVER_ERROR or logger.isEnabledFor(logging.DEBUG):
         logger.exception(str(exc))
 
-    return Response(__create_error_response_by_exception(exc), status=status_code, headers=headers)
+    return Response(create_error_response_by_exception(exc), status=status_code, headers=headers)
 
 
-def __create_error_response_by_exception(exc):
+def create_error_response_by_exception(exc):
     if hasattr(exc, 'messages'):
         messages = exc.messages
     else:
         messages = [str(exc)]
-    return __create_error_response(exc.__class__.__name__, messages)
+    return create_error_response(exc.__class__.__name__, messages)
 
 
-def __create_error_response(error_type, messages, code=0):
+def create_error_response(error_type, messages, code=0):
     error = dict()
     error['type'] = error_type
     error['messages'] = messages
