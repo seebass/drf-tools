@@ -9,11 +9,13 @@ from rest_framework.viewsets import GenericViewSet
 from drf_tools.auth.authentications import QuietBasicAuthentication
 from drf_tools.auth.filters import PermissionAwareFilterBackend
 from drf_tools.auth.permissions import BusinessPermission
+from drf_tools.auth.serializers import UserSerializer
 
 
 class AuthView(GenericViewSet):
     authentication_classes = (QuietBasicAuthentication, SessionAuthentication)
     permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
         login(request, request.user)
