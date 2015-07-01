@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='drf-tools',
-    version="0.9.3",
+    version="0.9.4",
     url='https://github.com/seebass/drf-tools',
     license='MIT',
     description='Multiple extensions and test utilities for Django REST Framework 3',

@@ -1,4 +1,5 @@
-from drf_tools.test.base import IncludeFields, ModelViewSetTest, AdvancedReadModelViewSetTestMixin
+import drf_hal_json
+from drf_tools.test.base import IncludeFields, ModelViewSetTest, AdvancedReadModelViewSetTestMixin, BaseRestTest
 
 from .models import TestResource, RelatedResource1, RelatedResource2
 
@@ -137,3 +138,13 @@ class RelatedResource2ViewSetTest(AdvancedReadModelViewSetTestMixin, ModelViewSe
 
     def _getIncludeFields(self):
         return IncludeFields(["name"], ["resource"], {"related_resources_1": IncludeFields(["name"])})
+
+
+class ApiRootTest(BaseRestTest):
+    def testGetApiRoot(self):
+        resp = self.client.get("/")
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(1, len(resp.data))
+        self.assertEqual(2, len(resp.data[drf_hal_json.LINKS_FIELD_NAME]))
+        self.assertTrue(len(resp.data[drf_hal_json.LINKS_FIELD_NAME]['viewsets']) > 0)
+        self.assertTrue(len(resp.data[drf_hal_json.LINKS_FIELD_NAME]['views']) > 0)
