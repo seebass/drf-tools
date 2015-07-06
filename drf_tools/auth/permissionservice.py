@@ -63,7 +63,7 @@ class BasePermissionService(object, metaclass=ABCMeta):
         other_parent = None
         other_parent_id = None
 
-        # there has to be a parent that holds the marketer in the parent lookups
+        # there has to be a parent that holds the permission model in the parent lookups
         for kwarg_key in view.kwargs:
             if not kwarg_key.startswith(drf_nested_routing.PARENT_LOOKUP_NAME_PREFIX):
                 continue

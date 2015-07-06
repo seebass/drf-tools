@@ -35,10 +35,7 @@ def check_base_permissions(request, user):
 
 class BusinessPermission(BasePermission):
     """
-    Permission that handles Marketer or AgofMarketer dependend permissions.
-
-    To make this permission class work, every model that belongs to a certain marketer needs to have the property 'marketer'
-    or 'agofMarketer' and the associated view needs to have a filter with the same name that filters its model accordingly
+    Permission that handles business dependend permissions.
     """
 
     def has_permission(self, request, view):
