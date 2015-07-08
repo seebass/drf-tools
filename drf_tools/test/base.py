@@ -317,13 +317,10 @@ class ReadModelViewSetTest(BaseModelViewSetTest):
         modelCount = len(modelList)
         queryParams = {self._PAGE_SIZE_FIELD_NAME: modelCount}
         modelsByUrl = {self._getAbsoluteDetailURI(model): model for model in modelList}
-        print(modelsByUrl)
         wildCardedParentLookups = self._getWildcardedParentLookups(self._getModelClass())
-        print(wildCardedParentLookups)
         resp = self._doGETList(self._getModelClass(), queryParams, wildCardedParentLookups)
         self.assertEqual(200, resp.status_code, resp.content)
         stateAttrs, linkAttrs, embeddedAttrs = self._splitContent(resp.data)
-        print(resp.data)
         self.assertEqual(stateAttrs[self._COUNT_FIELD_NAME], modelCount)
         self.assertEqual(stateAttrs[self._PAGE_SIZE_FIELD_NAME], modelCount)
         self.assertEqual(linkAttrs[self._SELF_FIELD_NAME], "{}?{}={}".format(
