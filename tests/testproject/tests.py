@@ -143,8 +143,9 @@ class RelatedResource2ViewSetTest(AdvancedReadModelViewSetTestMixin, ModelViewSe
 class ApiRootTest(BaseRestTest):
     def testGetApiRoot(self):
         resp = self.client.get("/")
+        print(resp.data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(1, len(resp.data))
         self.assertEqual(2, len(resp.data[drf_hal_json.LINKS_FIELD_NAME]))
         self.assertTrue(len(resp.data[drf_hal_json.LINKS_FIELD_NAME]['viewsets']) > 0)
-        self.assertTrue(len(resp.data[drf_hal_json.LINKS_FIELD_NAME]['views']) > 0)
+        self.assertTrue(len(resp.data[drf_hal_json.LINKS_FIELD_NAME]['views']) == 0)

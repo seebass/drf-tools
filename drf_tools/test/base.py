@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime, date
+from datetime import datetime, date, time
 import json
 import random
 
@@ -37,7 +37,7 @@ class BaseRestTest(TestCase):
     def setUp(self):
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
-        self.client.get("/")  # hack: has to be called initial for router registration
+        self.client.get("/api")  # hack: has to be called initial for router registration
 
     def _assertDatetimesEqual(self, datetime1, datetime2):
         if datetime1 and isinstance(datetime1, datetime):
@@ -52,6 +52,13 @@ class BaseRestTest(TestCase):
         if date2 and isinstance(date2, date):
             date2 = date2.strftime('%Y-%m-%d')
         self.assertEqual(date1, date2)
+
+    def _assertTimesEqual(self, time1, time2):
+        if time1 and isinstance(time1, time):
+            time1 = time1.strftime("%H:%M:%S")
+        if time2 and isinstance(time2, time):
+            time2 = time2.strftime("%H:%M:%S")
+        self.assertEqual(time1, time2)
 
     def _doGETDetails(self, modelObj, queryParams=None, **headers):
         resp = self.client.get(self._getRelativeDetailURI(modelObj=modelObj), queryParams, **headers)
@@ -127,10 +134,16 @@ class BaseRestTest(TestCase):
     def _getAbsoluteListURI(self, modelClass, parentLookups=None):
         return self._TESTSERVER_BASE_URL + self._getRelativeListURI(modelClass, parentLookups)
 
+    def _getAbsoluteListURIByBaseViewName(self, baseViewName, parentLookups=None):
+        return self._TESTSERVER_BASE_URL + self._getRelativeListURIByBaseViewName(baseViewName, parentLookups)
+
     def _getRelativeListURI(self, modelClass, parentLookups=None):
-        parent_lookups = drf_nested_routing.get_parent_query_lookups_by_class(modelClass)
+        return self._getRelativeListURIByBaseViewName(modelClass.__name__.lower(), parentLookups)
+
+    def _getRelativeListURIByBaseViewName(self, baseViewName, parentLookups=None):
+        parent_lookups = drf_nested_routing.get_parent_query_lookups_by_view(baseViewName)
         if parent_lookups and not parentLookups:
-            raise ValueError("Please specify parent lookups for '{}'".format(modelClass.__name__))
+            raise ValueError("Please specify parent lookups for '{}'".format(baseViewName))
 
         composedParentLookups = dict()
         if parent_lookups and parentLookups:
@@ -140,7 +153,7 @@ class BaseRestTest(TestCase):
                     continue
                 composedParentLookups[drf_nested_routing.PARENT_LOOKUP_NAME_PREFIX + lookup] = lookupId
 
-        return reverse(modelClass.__name__.lower() + '-list', kwargs=composedParentLookups)
+        return reverse(baseViewName + '-list', kwargs=composedParentLookups)
 
     def _assertLinksAndModelListEqual(self, linksList, modelList):
         if linksList is not None:
@@ -151,13 +164,7 @@ class BaseRestTest(TestCase):
             self.assertEqual(0, len(modelList))
 
     def __contentToJson(self, content):
-        cleanedContent = dict()
-        for attr, value in content.items():
-            cleanedValue = value
-            if not isinstance(value, dict) and value is not None:
-                cleanedValue = str(value)
-            cleanedContent[attr] = cleanedValue
-        return json.dumps(cleanedContent)
+        return json.dumps(content)
 
     def _buildContent(self, stateAttrs, linkAttrs=None, embeddedAttrs=None):
         content = dict(stateAttrs)
@@ -288,7 +295,6 @@ class CreateModelViewSetTest(BaseModelViewSetTest):
 
 
 class ReadModelViewSetTest(BaseModelViewSetTest):
-
     def _getAllowedListMethods(self):
         return super(ReadModelViewSetTest, self)._getAllowedListMethods() + ["GET", "HEAD"]
 
@@ -311,10 +317,13 @@ class ReadModelViewSetTest(BaseModelViewSetTest):
         modelCount = len(modelList)
         queryParams = {self._PAGE_SIZE_FIELD_NAME: modelCount}
         modelsByUrl = {self._getAbsoluteDetailURI(model): model for model in modelList}
+        print(modelsByUrl)
         wildCardedParentLookups = self._getWildcardedParentLookups(self._getModelClass())
+        print(wildCardedParentLookups)
         resp = self._doGETList(self._getModelClass(), queryParams, wildCardedParentLookups)
         self.assertEqual(200, resp.status_code, resp.content)
         stateAttrs, linkAttrs, embeddedAttrs = self._splitContent(resp.data)
+        print(resp.data)
         self.assertEqual(stateAttrs[self._COUNT_FIELD_NAME], modelCount)
         self.assertEqual(stateAttrs[self._PAGE_SIZE_FIELD_NAME], modelCount)
         self.assertEqual(linkAttrs[self._SELF_FIELD_NAME], "{}?{}={}".format(

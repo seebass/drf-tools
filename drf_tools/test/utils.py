@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-def withDebug(func):
+def with_debug(func):
     """Switch on DEBUG during a test (disabled by default). Useful for query logging."""
 
     @wraps(func)
