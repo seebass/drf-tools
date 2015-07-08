@@ -76,7 +76,8 @@ class CsvSerializer(object):
     @staticmethod
     def __validate_cell(cell):
         cell = str(cell) if cell is not None else ''
-        if "\t" in cell or "\n" in cell:
+        if "\t" in cell or "\n" in cell or '"' in cell:
+            cell = cell.replace('"', '""')
             cell = '"{}"'.format(cell)
         return cell
 
