@@ -69,7 +69,9 @@ class BasePermissionService(object, metaclass=ABCMeta):
                 continue
 
             kwarg_key_without_prefix = kwarg_key.replace(drf_nested_routing.PARENT_LOOKUP_NAME_PREFIX, '')
-            if '__' in kwarg_key:
+            if kwarg_key.endswith('__' + permission_model_attr):
+                return [view.kwargs[kwarg_key]]
+            elif '__' in kwarg_key:
                 other_parent = kwarg_key_without_prefix.split('__')[0]
                 if LINKS_FIELD_NAME in request.data and other_parent in request.data[LINKS_FIELD_NAME]:
                     other_parent_id = get_id_from_detail_uri(request.data[LINKS_FIELD_NAME][other_parent])
