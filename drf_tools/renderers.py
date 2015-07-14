@@ -21,7 +21,7 @@ class BaseFileRenderer(OriginalBaseRenderer):
 
 class CsvRenderer(BaseFileRenderer):
     media_type = "text/csv"
-    format = "txt"
+    format = "csv"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         self._add_filename_to_response(renderer_context)
