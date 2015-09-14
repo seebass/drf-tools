@@ -80,11 +80,11 @@ class BusinessPermission(BasePermission):
                 if not type(urls) is list:
                     urls = [urls]
                 for url in urls:
-                    if not self._can_read_url(request, url, resolver):
+                    if not self._can_read_url(request, url, resolver, key):
                         return False
         return True
 
-    def _can_read_url(self, request, url, resolver):
+    def _can_read_url(self, request, url, resolver, key):
         if url is None:
             return True
         sub_request = self.__make_sub_request(request, url, resolver)
