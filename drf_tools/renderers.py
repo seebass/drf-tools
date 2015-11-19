@@ -66,8 +66,10 @@ class AnyFileFromSystemRenderer(BaseFileRenderer):
     render_style = 'binary'
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        if not isinstance(data, str) or renderer_context['response'].status_code != 200:
+        if renderer_context['response'].status_code != 200:
             return data
         self._add_filename_to_response(renderer_context)
-        with open(data, "rb") as file:
-            return file.read()
+        if isinstance(data, str):
+            with open(data, "rb") as file:
+                return file.read()
+        return data
