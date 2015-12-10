@@ -39,7 +39,10 @@ def create_error_response_by_exception(exc):
         messages = exc.messages
     else:
         messages = [str(exc)]
-    return create_error_response(exc.__class__.__name__, messages)
+    code = 0
+    if hasattr(exc, 'code'):
+        code = exc.code
+    return create_error_response(exc.__class__.__name__, messages, code)
 
 
 def create_error_response(error_type, messages, code=0):
