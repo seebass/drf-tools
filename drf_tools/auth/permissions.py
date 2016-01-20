@@ -51,7 +51,7 @@ class BusinessPermission(BasePermission):
 
         if request.method == 'POST':
             permission_model_ids = permission_service.get_permission_model_ids_from_request(request, view)
-            if not self.__check_links(request):
+            if not self._check_links(request):
                 return False
             for permission_model_id in permission_model_ids:
                 if permission_service.has_permission(user, permission_model_id, view.queryset.model, Operation.CREATE):
@@ -64,7 +64,7 @@ class BusinessPermission(BasePermission):
         if permission_service.is_super_user(user) or (
             permission_service.is_super_reader(user) and request.method in SAFE_METHODS):
             return True
-        if request.method in ('PUT', 'PATCH') and not self.__check_links(request):
+        if request.method in ('PUT', 'PATCH') and not self._check_links(request):
             return False
         operation = self.__get_operation(request.method)
         return permission_service.has_object_permission(user, obj, operation)
