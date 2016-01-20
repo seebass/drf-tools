@@ -69,7 +69,7 @@ class BusinessPermission(BasePermission):
         operation = self.__get_operation(request.method)
         return permission_service.has_object_permission(user, obj, operation)
 
-    def __check_links(self, request):
+    def _check_links(self, request):
         if LINKS_FIELD_NAME in request.data:
             urlconf = settings.ROOT_URLCONF
             urlresolvers.set_urlconf(urlconf)
