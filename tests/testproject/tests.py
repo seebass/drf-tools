@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import drf_hal_json
 from drf_tools.test.base import IncludeFields, ModelViewSetTest, AdvancedReadModelViewSetTestMixin, BaseRestTest
 
@@ -55,6 +57,7 @@ class RelatedResource1ViewSetTest(AdvancedReadModelViewSetTestMixin, ModelViewSe
         testResource = TestResource.objects.create(name="test-resource")
         stateAttrs = {
             "name": "related-resource1",
+            "number": Decimal('2.33'),
             "active": True,
         }
         linkAttrs = {
@@ -69,6 +72,7 @@ class RelatedResource1ViewSetTest(AdvancedReadModelViewSetTestMixin, ModelViewSe
         stateAttrs, linkAttrs, embeddedAttrs = self._splitContent(content)
 
         self.assertEqual(stateAttrs.get('name'), relatedResource1.name)
+        self.assertEqual(Decimal(stateAttrs.get('number')), relatedResource1.number)
         self.assertEqual(stateAttrs.get('active'), relatedResource1.active)
 
         if self._SELF_FIELD_NAME in content:
@@ -76,7 +80,7 @@ class RelatedResource1ViewSetTest(AdvancedReadModelViewSetTestMixin, ModelViewSe
             self.assertEqual(linkAttrs["resource"], self._getAbsoluteDetailURI(relatedResource1.resource))
 
     def _getUpdateAttributes(self):
-        return {"name": "new_name"}
+        return {"name": "new_name", "number": Decimal('3.55')}
 
     def _getIncludeFields(self):
         return IncludeFields(["name"], [], {"resource": IncludeFields(["name"])})

@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime, date, time
 import json
 import random
+from decimal import Decimal
 
 from six.moves.urllib.parse import urlparse, urlencode, unquote, parse_qs
 from six.moves.urllib.request import urlopen, Request
@@ -164,7 +165,12 @@ class BaseRestTest(TestCase):
             self.assertEqual(0, len(modelList))
 
     def __contentToJson(self, content):
-        return json.dumps(content)
+        def decimal_default(obj):
+            if isinstance(obj, Decimal):
+                return float(obj)
+            raise obj
+
+        return json.dumps(content, default=decimal_default)
 
     def _buildContent(self, stateAttrs, linkAttrs=None, embeddedAttrs=None):
         content = dict(stateAttrs)
