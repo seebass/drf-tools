@@ -1,6 +1,8 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.authentication import BasicAuthentication
+
+User = get_user_model()
 
 
 class QuietBasicAuthentication(BasicAuthentication):
