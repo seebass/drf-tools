@@ -26,7 +26,7 @@ class HalNestedFieldsModelSerializer(NestedRoutingSerializerMixin, EnumFieldSeri
 
 class CsvSerializer(object):
     @staticmethod
-    def serialize(data):
+    def serialize(data, separator='\t'):
         if isinstance(data, bytes):
             return data
 
@@ -37,7 +37,7 @@ class CsvSerializer(object):
         for row in data:
             if not isinstance(row, (list, tuple)):
                 row = [row]
-            csv_buffer.write(('\t'.join(CsvSerializer.__validate_cell(cell) for cell in row) + '\n').encode('utf-8'))
+            csv_buffer.write((separator.join(CsvSerializer.__validate_cell(cell) for cell in row) + '\n').encode('utf-8'))
 
         return csv_buffer.getvalue()
 

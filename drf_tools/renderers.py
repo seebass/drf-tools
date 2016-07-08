@@ -22,10 +22,11 @@ class BaseFileRenderer(OriginalBaseRenderer):
 class CsvRenderer(BaseFileRenderer):
     media_type = "text/csv"
     format = "csv"
+    separator = '\t'
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         self._add_filename_to_response(renderer_context)
-        return CsvSerializer.serialize(data)
+        return CsvSerializer.serialize(data, self.separator)
 
 
 class XlsxRenderer(BaseFileRenderer):
