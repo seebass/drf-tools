@@ -66,7 +66,7 @@ class BusinessPermission(BasePermission):
             return True
         if request.method in ('PUT', 'PATCH') and not self._check_links(request):
             return False
-        operation = self.__get_operation(request.method)
+        operation = self._get_operation(request.method)
         return permission_service.has_object_permission(user, obj, operation)
 
     def _check_links(self, request):
@@ -87,8 +87,8 @@ class BusinessPermission(BasePermission):
     def _can_read_url(self, request, url, resolver, key):
         if url is None:
             return True
-        sub_request = self.__make_sub_request(request, url, resolver)
-        view, Model, obj = self.__get_view_model_object_for_request(sub_request)
+        sub_request = self._make_sub_request(request, url, resolver)
+        view, Model, obj = self._get_view_model_object_for_request(sub_request)
         if not obj:
             raise Model.DoesNotExist(url)
         try:
@@ -98,8 +98,7 @@ class BusinessPermission(BasePermission):
         except PermissionDenied:
             return False
 
-    @staticmethod
-    def __make_sub_request(request, url, resolver):
+    def _make_sub_request(self, request, url, resolver):
         wsgi_request = copy(request._request)
         wsgi_request.method = 'GET'
         wsgi_request.path = wsgi_request.path_info = urlsplit(url).path
@@ -109,8 +108,7 @@ class BusinessPermission(BasePermission):
         sub_request.authenticators = request.authenticators
         return sub_request
 
-    @staticmethod
-    def __get_view_model_object_for_request(request):
+    def _get_view_model_object_for_request(self, request):
         callback, callback_args, callback_kwargs = request.resolver_match
         ModelCls = callback.cls.queryset.model
         lookups = {}
@@ -121,8 +119,7 @@ class BusinessPermission(BasePermission):
         queryset = ModelCls.objects.filter(**lookups)
         return callback.cls(), ModelCls, queryset.first()
 
-    @staticmethod
-    def __get_operation(method):
+    def _get_operation(self, method):
         if method == "PUT" or method == "PATCH":
             return Operation.UPDATE
         elif method == "POST":
