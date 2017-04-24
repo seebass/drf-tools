@@ -4,6 +4,8 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core import urlresolvers
 import drf_nested_routing
+from django.db.models.base import Model
+from django_tooling.moduleloading import load_module
 from rest_framework.exceptions import ParseError
 
 from drf_tools.validation.registry import validationRegistry
@@ -59,5 +61,11 @@ class ValidationRequest(metaclass=ABCMeta):
             if k.startswith(drf_nested_routing.PARENT_LOOKUP_NAME_PREFIX):
                 k = k[len(drf_nested_routing.PARENT_LOOKUP_NAME_PREFIX):]
             lookups[k] = v
-        queryset = ModelCls.objects.filter(**lookups)
-        return queryset.first()
+
+        if issubclass(ModelCls, Model):
+            return ModelCls.objects.filter(**lookups).first()
+
+        if hasattr(settings, 'VALIDATION_OBJECT_RETRIEVAL_FUNCTION'):
+            return load_module(settings.VALIDATION_OBJECT_RETRIEVAL_FUNCTION)(ModelCls, lookups)
+
+        return None
