@@ -25,11 +25,9 @@ permission_service = load_module(PERMISSION_SERVICE)()
 def check_base_permissions(request, user):
     if permission_service.is_super_user(user) or (permission_service.is_super_reader(user) and request.method in SAFE_METHODS):
         return True
-    if request.method == "OPTIONS":
-        return True
-    if is_detail_uri(request.path) or request.method in ("GET", 'HEAD'):
-        # detail requests are handled in has_object_permission
+    if request.method != 'POST':
         # GET/HEAD on list endpoints are filtered in PermissionAwareFilterBackend
+        # detail requests are handled in has_object_permission
         return True
 
 
@@ -43,11 +41,11 @@ class BusinessPermission(BasePermission):
         if not user or not user.is_authenticated():
             return False
 
-        if check_base_permissions(request, user):
-            return True
-
         if not permission_service.is_valid_model(view.queryset.model):
             return False
+
+        if check_base_permissions(request, user):
+            return True
 
         if request.method == 'POST':
             permission_model_ids = permission_service.get_permission_model_ids_from_request(request, view)
