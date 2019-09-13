@@ -4,7 +4,7 @@ import zipfile
 
 from chardet.universaldetector import UniversalDetector
 from openpyxl import Workbook, load_workbook
-from openpyxl.cell import Cell
+from openpyxl.cell import cell
 from rest_framework.serializers import HyperlinkedModelSerializer
 from drf_enum_field.serializers import EnumFieldSerializerMixin
 from drf_hal_json.serializers import HalModelSerializer, HalEmbeddedSerializer
@@ -102,10 +102,10 @@ class XlsxSerializer(object):
         sheet = workbook.active
         for row_index, row in enumerate(data):
             for column_index, value in enumerate(row):
-                data_type = Cell.TYPE_STRING
+                data_type = cell.TYPE_STRING
                 if isinstance(value, (int, float)):
-                    data_type = Cell.TYPE_NUMERIC
-                if data_type == Cell.TYPE_STRING:
+                    data_type = cell.TYPE_NUMERIC
+                if data_type == cell.TYPE_STRING:
                     value = str(value)
                 sheet.cell(column=column_index + 1, row=row_index + 1).set_explicit_value(value, data_type=data_type)
         xlsx_file = BytesIO()
@@ -126,4 +126,4 @@ class XlsxSerializer(object):
         if not worksheet:
             raise ValueError("No worksheet found.")
 
-        return [[cell.value for cell in row] for row in worksheet.rows]
+        return [[c.value for c in row] for row in worksheet.rows]

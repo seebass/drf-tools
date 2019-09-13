@@ -18,7 +18,7 @@ setup(
         'drf-enum-field>=0.9.0',
         'drf-nested-routing>=0.9.6',
         'django-filter>=0.10.0',
-        'openpyxl>=2.2.5',
+        'openpyxl>=2.6.3',
         'chardet>=2.3.0'
     ],
     zip_safe=False,
