@@ -18,7 +18,7 @@ class NestedRouterWithExtendedRootView(NestedRouterMixin, DefaultRouter):
         self.__api_view_urls = api_view_urls
         super(NestedRouterWithExtendedRootView, self).__init__()
 
-    def get_api_root_view(self):
+    def get_api_root_view(self, schema_urls=None):
         api_root_routes = {}
         list_name = self.routes[0].name
         for prefix, viewset, basename in self.registry:
