@@ -1,5 +1,4 @@
-from django.core.validators import EMPTY_VALUES
-from django_filters import FilterSet, BooleanFilter
+from django_filters import FilterSet, BooleanFilter, STRICTNESS
 from django_filters.filters import Filter
 from django import forms
 from django.utils import six
@@ -13,11 +12,17 @@ class ListFilterSet(FilterSet):
     @property
     def qs(self):
         if not hasattr(self, '_qs'):
-            valid = self.is_bound and self.form.is_valid()
-
-            if self.strict and self.is_bound and not valid:
-                self._qs = self.queryset.none()
+            if not self.is_bound:
+                self._qs = self.queryset.all()
                 return self._qs
+
+            if not self.form.is_valid():
+                if self.strict == STRICTNESS.RAISE_VALIDATION_ERROR:
+                    raise forms.ValidationError(self.form.errors)
+                elif self.strict == STRICTNESS.RETURN_NO_RESULTS:
+                    self._qs = self.queryset.none()
+                    return self._qs
+                # else STRICTNESS.IGNORE...  ignoring
 
             # start with all the results and filter from there
             qs = self.queryset.all()
@@ -25,7 +30,7 @@ class ListFilterSet(FilterSet):
                 # CUSTOM:START
                 value_list = None
 
-                if valid and self.data:
+                if self.data:
                     value_list = self.data.getlist(name)
 
                 if value_list:  # valid & clean data
@@ -40,21 +45,6 @@ class ListFilterSet(FilterSet):
                             filtered_qs |= filter_.filter(qs, value)
                     qs = filtered_qs
                     # CUSTOM:END
-
-            if self._meta.order_by:
-                order_field = self.form.fields[self.order_by_field]
-                data = self.form[self.order_by_field].data
-                ordered_value = None
-                try:
-                    ordered_value = order_field.clean(data)
-                except forms.ValidationError:
-                    pass
-
-                if ordered_value in EMPTY_VALUES and self.strict:
-                    ordered_value = self.form.fields[self.order_by_field].choices[0][0]
-
-                if ordered_value:
-                    qs = qs.order_by(*self.get_order_by(ordered_value))
 
             self._qs = qs
 

@@ -12,12 +12,12 @@ setup(
     packages=find_packages(exclude=['tests*']),
     install_requires=[
         'django>=1.10',
-        'djangorestframework>=3.4.0',
+        'djangorestframework>=3.6.4',
         'drf-nested-fields>=0.9.5',
         'drf-hal-json>=0.9.0',
         'drf-enum-field>=0.9.0',
         'drf-nested-routing>=0.9.6',
-        'django-filter>=0.10.0',
+        'django-filter==1.0.4',
         'openpyxl>=2.6.3',
         'chardet>=2.3.0'
     ],

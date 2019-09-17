@@ -68,6 +68,7 @@ class DefaultSerializerMixin(object):
             class DefaultSerializer(HalNestedFieldsModelSerializer):
                 class Meta:
                     model = self.queryset.model
+                    fields = '__all__'
 
             self.serializer_class = DefaultSerializer
 
