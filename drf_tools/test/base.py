@@ -40,11 +40,14 @@ class BaseRestTest(TestCase):
         logger.setLevel(logging.DEBUG)
         self.client.get("/api")  # hack: has to be called initial for router registration
 
-    def _assertDatetimesEqual(self, datetime1, datetime2):
+    def _assertDatetimesEqual(self, datetime1, datetime2, includeMilliseconds=False):
         if datetime1 and isinstance(datetime1, datetime):
             datetime1 = datetime1.strftime(DATETIME_FORMAT_ISO)
         if datetime2 and isinstance(datetime2, datetime):
             datetime2 = datetime2.strftime(DATETIME_FORMAT_ISO)
+        if not includeMilliseconds:
+            datetime1 = datetime1[:19] if datetime1 else datetime1
+            datetime2 = datetime2[:19] if datetime2 else datetime2
         self.assertEqual(datetime1, datetime2)
 
     def _assertDatesEqual(self, date1, date2):
