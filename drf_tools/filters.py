@@ -1,7 +1,7 @@
-from django_filters import FilterSet, BooleanFilter, STRICTNESS
+from django.db import models
+from django_filters import FilterSet, BooleanFilter
 from django_filters.filters import Filter
 from django import forms
-from django.utils import six
 
 
 class ListFilterSet(FilterSet):
@@ -9,46 +9,32 @@ class ListFilterSet(FilterSet):
     The filterset handles a list of values as filter, that are connected using the OR-Operator
     """
 
-    @property
-    def qs(self):
-        if not hasattr(self, '_qs'):
-            if not self.is_bound:
-                self._qs = self.queryset.all()
-                return self._qs
+    def filter_queryset(self, queryset):
+        for name, value in self.form.cleaned_data.items():
 
-            if not self.form.is_valid():
-                if self.strict == STRICTNESS.RAISE_VALIDATION_ERROR:
-                    raise forms.ValidationError(self.form.errors)
-                elif self.strict == STRICTNESS.RETURN_NO_RESULTS:
-                    self._qs = self.queryset.none()
-                    return self._qs
-                # else STRICTNESS.IGNORE...  ignoring
+            # CUSTOM:START
+            filter_ = self.filters[name]
+            value_list = None
 
-            # start with all the results and filter from there
-            qs = self.queryset.all()
-            for name, filter_ in six.iteritems(self.filters):
-                # CUSTOM:START
-                value_list = None
+            if self.data:
+                value_list = self.data.getlist(name)
 
-                if self.data:
-                    value_list = self.data.getlist(name)
+            if value_list:
+                filtered_qs = None
+                for list_value in value_list:
+                    if isinstance(filter_, BooleanFilter):
+                        list_value = self._str_to_boolean(list_value)
+                    if not filtered_qs:
+                        filtered_qs = filter_.filter(queryset, list_value)
+                    else:
+                        filtered_qs |= filter_.filter(queryset, list_value)
+                queryset = filtered_qs
+            # CUSTOM:END
 
-                if value_list:  # valid & clean data
-                    filtered_qs = None
-                    for value in value_list:
-                        if isinstance(filter_, BooleanFilter):
-                            value = self._str_to_boolean(value)
-
-                        if not filtered_qs:
-                            filtered_qs = filter_.filter(qs, value)
-                        else:
-                            filtered_qs |= filter_.filter(qs, value)
-                    qs = filtered_qs
-                    # CUSTOM:END
-
-            self._qs = qs
-
-        return self._qs
+            assert isinstance(queryset, models.QuerySet), \
+                "Expected '%s.%s' to return a QuerySet, but got a %s instead." \
+                % (type(self).__name__, name, type(queryset).__name__)
+        return queryset
 
     @staticmethod
     def _str_to_boolean(value):
