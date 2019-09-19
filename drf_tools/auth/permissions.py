@@ -1,22 +1,18 @@
 from copy import copy
-
 from urllib.parse import urlsplit
 
-from django.core import urlresolvers
 from django.conf import settings
+from django.urls import URLResolver, set_urlconf, get_resolver
+from django.urls.resolvers import RoutePattern
 from django_tooling.moduleloading import load_module
 from drf_hal_json import LINKS_FIELD_NAME
 import drf_nested_routing
-from drf_tools.utils import is_detail_uri
 from rest_framework.exceptions import PermissionDenied
-
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-
 from rest_framework.request import Request
-
 from rest_framework.settings import api_settings
-from drf_tools.auth import PERMISSION_SERVICE
 
+from drf_tools.auth import PERMISSION_SERVICE
 from drf_tools.auth.models import Operation
 
 permission_service = load_module(PERMISSION_SERVICE)()
@@ -38,7 +34,7 @@ class BusinessPermission(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        if not user or not user.is_authenticated():
+        if not user or not user.is_authenticated:
             return False
 
         if not permission_service.is_valid_model(view.queryset.model):
@@ -70,8 +66,8 @@ class BusinessPermission(BasePermission):
     def _check_links(self, request):
         if LINKS_FIELD_NAME in request.data:
             urlconf = settings.ROOT_URLCONF
-            urlresolvers.set_urlconf(urlconf)
-            resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+            set_urlconf(urlconf)
+            resolver = get_resolver(urlconf)
             for key, urls in request.data[LINKS_FIELD_NAME].items():
                 if key == api_settings.URL_FIELD_NAME:
                     continue  # we don't check the object itself
@@ -129,14 +125,14 @@ class BusinessPermission(BasePermission):
 
 class IsSuperUserPermission(BasePermission):
     def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated():
+        if not request.user or not request.user.is_authenticated:
             return False
         return permission_service.is_super_user(request.user)
 
 
 class IsSuperUserOrAuthenticatedReadOnlyPermission(BasePermission):
     def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated():
+        if not request.user or not request.user.is_authenticated:
             return False
         if request.method in SAFE_METHODS:
             return True
@@ -152,7 +148,7 @@ class IsSuperUserOrReadOnlyPermission(BasePermission):
 
 class IsSuperUserOrBusinessAdminReadOnly(BasePermission):
     def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated():
+        if not request.user or not request.user.is_authenticated:
             return False
 
         if request.method in SAFE_METHODS and permission_service.is_business_admin(request.user):

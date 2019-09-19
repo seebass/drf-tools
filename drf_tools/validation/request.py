@@ -2,7 +2,8 @@ from abc import ABCMeta
 from urllib.parse import urlsplit
 
 from django.conf import settings
-from django.core import urlresolvers
+from django.urls import set_urlconf, get_resolver
+
 import drf_nested_routing
 from django.db.models.base import Model
 from django_tooling.moduleloading import load_module
@@ -38,8 +39,8 @@ class ValidationRequest(metaclass=ABCMeta):
     def __getData(self, requestData):
         if '_links' in requestData:
             urlconf = settings.ROOT_URLCONF
-            urlresolvers.set_urlconf(urlconf)
-            resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+            set_urlconf(urlconf)
+            resolver = get_resolver(urlconf)
             for prop, url in requestData['_links'].items():
                 requestData[prop] = self.__getObjectForUrl(url, resolver)
             del requestData['_links']

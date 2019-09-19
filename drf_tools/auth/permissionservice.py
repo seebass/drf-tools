@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor, \
+    ForwardManyToOneDescriptor
 from drf_hal_json import LINKS_FIELD_NAME, is_hal_content_type
 import drf_nested_routing
 
@@ -88,5 +90,8 @@ class BasePermissionService(object, metaclass=ABCMeta):
             return None
 
         parent_attr = getattr(model, parent_field_name)
-        parent_cls = parent_attr.field.rel.to
+        if isinstance(parent_attr, (ForwardOneToOneDescriptor, ForwardManyToOneDescriptor)):
+            parent_cls = parent_attr.field.related_model
+        else:
+            parent_cls = parent_attr.target_field.model
         return self.get_permission_model_ids_from_object(parent_cls.objects.get(id=parent_id))

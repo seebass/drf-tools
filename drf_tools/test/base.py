@@ -4,13 +4,11 @@ import json
 import random
 from decimal import Decimal
 
-from six.moves.urllib.parse import urlparse, urlencode, unquote, parse_qs
-from six.moves.urllib.request import urlopen, Request
-from six.moves.urllib.error import HTTPError
+from django.urls import reverse
+from six.moves.urllib.parse import urlparse, unquote, parse_qs
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django.db.models import Model
 from django.test import TestCase
 from enumfields import Enum

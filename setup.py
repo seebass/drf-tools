@@ -11,13 +11,13 @@ setup(
     author_email='bredehoeft.sebastian@gmail.com',
     packages=find_packages(exclude=['tests*']),
     install_requires=[
-        'django>=1.10',
-        'djangorestframework>=3.6.4',
+        'django>=2.0',
+        'djangorestframework>=3.10.3',
         'drf-nested-fields>=0.9.5',
         'drf-hal-json>=0.9.0',
         'drf-enum-field>=0.9.0',
-        'drf-nested-routing>=0.9.6',
-        'django-filter==1.0.4',
+        'drf-nested-routing>=0.10.0',
+        'django-filter==2.2.0',
         'openpyxl>=2.6.3',
         'chardet>=2.3.0'
     ],
